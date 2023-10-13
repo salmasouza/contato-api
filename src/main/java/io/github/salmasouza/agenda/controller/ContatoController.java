@@ -3,14 +3,15 @@ package io.github.salmasouza.agenda.controller;
 import io.github.salmasouza.agenda.model.Contato;
 import io.github.salmasouza.agenda.repository.ContatoRepository;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -37,8 +38,13 @@ public class ContatoController {
     }
 
     @GetMapping
-    public List<Contato> list(){
-        return contatoRepository.findAll();
+    public Page<Contato> list(
+            @RequestParam(value = "page", defaultValue = "0") Integer pagina,
+            @RequestParam(value= "size", defaultValue = "10") Integer tamanhoPagina
+    ){
+        Sort sort = Sort.by(Sort.Direction.ASC,"nome");
+        PageRequest pageRequest = PageRequest.of(pagina, tamanhoPagina, sort);
+        return contatoRepository.findAll(pageRequest);
     }
 
     @GetMapping("/{id}")
